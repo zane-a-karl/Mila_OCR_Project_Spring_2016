@@ -15,6 +15,9 @@
 //#include "sizegripitem.h"
 #include <QGraphicsRectItem>
 
+/**
+ * @brief The Screenshot class
+ */
 class Screenshot : public QWidget
 {
     Q_OBJECT

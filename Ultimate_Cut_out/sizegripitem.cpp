@@ -1,6 +1,11 @@
 #include <QBrush>
 #include "SizeGripItem.h"
 
+/**
+ * @brief SizeGripItem::HandleItem::HandleItem
+ * @param positionFlags
+ * @param parent
+ */
 SizeGripItem::HandleItem::HandleItem(int positionFlags, SizeGripItem* parent)
     : QGraphicsRectItem(-4, -4, 8, 8, parent),
       positionFlags_(positionFlags),
@@ -12,11 +17,21 @@ SizeGripItem::HandleItem::HandleItem(int positionFlags, SizeGripItem* parent)
     setFlag(ItemSendsGeometryChanges);
 }
 
+/**
+ * @brief SizeGripItem::HandleItem::positionFlags
+ * @return
+ */
 int SizeGripItem::HandleItem::positionFlags() const
 {
     return positionFlags_;
 }
 
+/**
+ * @brief SizeGripItem::HandleItem::itemChange
+ * @param change
+ * @param value
+ * @return
+ */
 QVariant SizeGripItem::HandleItem::itemChange(GraphicsItemChange change,
                                               const QVariant &value)
 {
@@ -62,6 +77,11 @@ QVariant SizeGripItem::HandleItem::itemChange(GraphicsItemChange change,
     return retVal;
 }
 
+/**
+ * @brief SizeGripItem::HandleItem::restrictPosition
+ * @param newPos
+ * @return
+ */
 QPointF SizeGripItem::HandleItem::restrictPosition(const QPointF& newPos)
 {
     QPointF retVal = pos();
@@ -85,6 +105,11 @@ QPointF SizeGripItem::HandleItem::restrictPosition(const QPointF& newPos)
     return retVal;
 }
 
+/**
+ * @brief SizeGripItem::SizeGripItem
+ * @param resizer
+ * @param parent
+ */
 SizeGripItem::SizeGripItem(Resizer* resizer, QGraphicsItem* parent)
     : QGraphicsItem(parent),
       resizer_(resizer)
@@ -103,17 +128,30 @@ SizeGripItem::SizeGripItem(Resizer* resizer, QGraphicsItem* parent)
     updateHandleItemPositions();
 }
 
+/**
+ * @brief SizeGripItem::~SizeGripItem
+ */
 SizeGripItem::~SizeGripItem()
 {
     if (resizer_)
         delete resizer_;
 }
 
+/**
+ * @brief SizeGripItem::boundingRect
+ * @return
+ */
 QRectF SizeGripItem::boundingRect() const
 {
     return rect_;
 }
 
+/**
+ * @brief SizeGripItem::paint
+ * @param painter
+ * @param option
+ * @param widget
+ */
 void SizeGripItem::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
                          QWidget* widget)
@@ -136,6 +174,9 @@ IMPL_SET_FN(const QPointF&, TopRight)
 IMPL_SET_FN(const QPointF&, BottomRight)
 IMPL_SET_FN(const QPointF&, BottomLeft)
 
+/**
+ * @brief SizeGripItem::doResize
+ */
 void SizeGripItem::doResize()
 {
     if (resizer_)
@@ -145,6 +186,9 @@ void SizeGripItem::doResize()
     }
 }
 
+/**
+ * @brief SizeGripItem::updateHandleItemPositions
+ */
 void SizeGripItem::updateHandleItemPositions()
 {
     foreach (HandleItem* item, handleItems_)

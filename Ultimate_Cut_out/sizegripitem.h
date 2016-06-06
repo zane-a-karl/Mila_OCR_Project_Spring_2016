@@ -8,6 +8,9 @@
 #include <QPoint>
 #include <QMessageBox>
 
+/**
+ * @brief The SizeGripItem class
+ */
 class SizeGripItem : public QGraphicsItem
 {
     signals:

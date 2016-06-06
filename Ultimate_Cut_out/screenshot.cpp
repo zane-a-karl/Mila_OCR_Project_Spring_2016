@@ -7,8 +7,13 @@
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <iostream>
+#include <QRect>
+#include <QSize>
+#include <QPainter>
 
-
+/**
+ * @brief Screenshot::Screenshot
+ */
 Screenshot::Screenshot()
 {
     screenshotLabel = new QLabel;
@@ -31,6 +36,9 @@ Screenshot::Screenshot()
     resize(300, 200);
 }
 
+/**
+ * @brief Screenshot::resizeEvent
+ */
 void Screenshot::resizeEvent(QResizeEvent * /* event */)
 {
     QSize scaledSize = originalPixmap.size();
@@ -39,19 +47,29 @@ void Screenshot::resizeEvent(QResizeEvent * /* event */)
         updateScreenshotLabel();
 }
 
+/**
+ * @brief Screenshot::newScreenshot
+ */
 void Screenshot::newScreenshot()
 {
     if (hideThisWindowCheckBox->isChecked())
+    {
         hide();
+    }
     newScreenshotButton->setDisabled(true);
 
-    QTimer::singleShot(delaySpinBox->value() * 1000, this, SLOT(shootScreen()));
+    QTimer::singleShot(delaySpinBox->value() * 1000
+                       , this, SLOT(shootScreen()));
 }
 
+/**
+ * @brief Screenshot::saveScreenshot
+ */
 void Screenshot::saveScreenshot()
 {
     QString format = "png";
-    QString initialPath = QDir::currentPath() + tr("/untitled.") + format;
+    QString initialPath = QDir::currentPath()
+            + tr("/untitled.") + format;
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"),
                                initialPath,
@@ -62,6 +80,9 @@ void Screenshot::saveScreenshot()
         originalPixmap.save(fileName, format.toAscii());
 }
 
+/**
+ * @brief Screenshot::shootScreen
+ */
 void Screenshot::shootScreen()
 {
     if (delaySpinBox->value() != 0)
@@ -70,20 +91,32 @@ void Screenshot::shootScreen()
     }
 
     click1->setX(gripper->x());
-    click2->setY(gripper->y());
-    int x_diff = click2->rx() - click1->rx();
-    int y_diff = click2->ry() - click1->ry();
-    std::cout << click1->x() << " " << click1->y() << std::endl;
-    originalPixmap = QPixmap::grabWidget(label, click1->rx(), click1->ry()
+    click1->setY(gripper->y());
+    click2->setX(gripper->x() + gripper->boundingRect().width());
+    click2->setY(gripper->y() + gripper->boundingRect().height());
+    double x_diff = click2->rx() - click1->rx();
+    double y_diff = click2->ry() - click1->ry();
+
+    std::cout << "these are top left and bottom right corrds for rect " << std::endl;
+    std::cout << click1->rx() << "  " << click1->ry() << std::endl;
+    std::cout << click2->rx() << "  " << click2->ry() << std::endl;
+    originalPixmap = QPixmap::grabWidget(label
+                                         , click1->rx()
+                                         , click1->ry()
                                          , x_diff
                                          , y_diff);
     updateScreenshotLabel();
 
     newScreenshotButton->setDisabled(false);
     if (hideThisWindowCheckBox->isChecked())
+    {
         show();
+    }
 }
 
+/**
+ * @brief Screenshot::updateCheckBox
+ */
 void Screenshot::updateCheckBox()
 {
     if (delaySpinBox->value() == 0)
@@ -97,6 +130,9 @@ void Screenshot::updateCheckBox()
     }
 }
 
+/**
+ * @brief Screenshot::createOptionsGroupBox
+ */
 void Screenshot::createOptionsGroupBox()
 {
     optionsGroupBox = new QGroupBox(tr("Options"));
@@ -117,6 +153,9 @@ void Screenshot::createOptionsGroupBox()
     optionsGroupBox->setLayout(optionsGroupBoxLayout);
 }
 
+/**
+ * @brief Screenshot::createButtonsLayout
+ */
 void Screenshot::createButtonsLayout()
 {
     newScreenshotButton = createButton(tr("New Screenshot"), this, SLOT(newScreenshot()));
@@ -132,6 +171,13 @@ void Screenshot::createButtonsLayout()
     buttonsLayout->addWidget(quitScreenshotButton);
 }
 
+/**
+ * @brief Screenshot::createButton
+ * @param text
+ * @param receiver
+ * @param member
+ * @return
+ */
 QPushButton *Screenshot::createButton(const QString &text, QWidget *receiver,
                                       const char *member)
 {
@@ -140,6 +186,9 @@ QPushButton *Screenshot::createButton(const QString &text, QWidget *receiver,
     return button;
 }
 
+/**
+ * @brief Screenshot::updateScreenshotLabel
+ */
 void Screenshot::updateScreenshotLabel()
 {
     screenshotLabel->setPixmap(originalPixmap/*.scaled(screenshotLabel->size(),

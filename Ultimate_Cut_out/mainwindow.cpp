@@ -11,7 +11,11 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <iostream>
-
+#include <QPoint>
+#include <QPointF>
+/**
+ *
+ */
 namespace
 {
     class RectResizer : public SizeGripItem::Resizer
@@ -27,10 +31,10 @@ namespace
             }
     };
 }
-
-
-
-
+/**
+ * @brief MainWindow::MainWindow
+ * @param parent
+ */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -47,7 +51,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     main_window->setLayout(button_layout);//add layout to widget
     this->setCentralWidget(main_window);//set central widget
 }
-
+/**
+ * @brief MainWindow::~MainWindow
+ */
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -95,11 +101,24 @@ void MainWindow::chooseFile()
         QPoint* c1 = new QPoint(gifImage->x()+25,gifImage->y()+25);
         QPoint* c2 = new QPoint(c1->rx()+300,c1->ry()+300);
 
+
+
         //SizeGrip stuff
         QGraphicsScene* scene = new QGraphicsScene;
         scene->addPixmap(*(gifImage->pixmap()));
 
-        QGraphicsRectItem* rectItem = new QGraphicsRectItem(QRectF(0, 0, 320, 240));
+
+
+        QGraphicsView* graphicsView = new QGraphicsView(this);
+        graphicsView->setScene(scene);
+        gview = graphicsView;
+        gscene = scene;
+
+        this->setCentralWidget(graphicsView);
+        this->setFixedSize(500,500);
+        this->move(0,0);
+
+        QGraphicsRectItem* rectItem = new QGraphicsRectItem(QRectF(10, 10, 300, 150));
         rectItem->setBrush(Qt::gray);
         rectItem->setOpacity( 0.15 );
         rectItem->setPen(Qt::NoPen);
@@ -108,23 +127,28 @@ void MainWindow::chooseFile()
 
         SizeGripItem* rectSizeGripItem = new SizeGripItem(new RectResizer, rectItem);
 
-        QGraphicsView* graphicsView = new QGraphicsView(this);
-        graphicsView->setScene(scene);
-
-        this->setCentralWidget(graphicsView);
 
         //Screenshot stuff
         Screenshot* screen = new Screenshot();
         screen->set_label(gifImage);
-        screen->set_gripper(rectItem);
+
         c1 = new QPoint(rectItem->x(),rectItem->y());
         c2 = new QPoint(rectItem->x() + rectItem->rect().width()
                         , rectItem->y() + rectItem->rect().height());
 
+        QPoint c1_viewpoint = graphicsView->mapFromGlobal(*c1);
+        QPointF c1_scenepoint = graphicsView->mapToScene(c1_viewpoint);
+        QPoint c2_viewpoint = graphicsView->mapFromGlobal(*c2);
+        QPointF c2_scenepoint = graphicsView->mapToScene(c2_viewpoint);
+        c1->setX(c1_scenepoint.toPoint().rx());
+        c1->setY(c1_scenepoint.toPoint().ry());
+        c2->setX(c2_scenepoint.toPoint().rx());
+        c2->setY(c2_scenepoint.toPoint().ry());
 
         screen->set_click1(c1);
         screen->set_click2(c2);
-
+        screen->set_gripper(rectItem);
+        screen->move(QPoint(600,0));
         screen->show();
     }
     else
